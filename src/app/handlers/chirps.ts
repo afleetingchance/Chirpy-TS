@@ -1,37 +1,45 @@
 import { Request, Response } from "express";
 import { BadRequestError } from "../errorClasses.js";
+import { NewChirp } from "../../db/schema.js";
+import { createChirp, getChirpList } from "../../db/queries/chirps.js";
 
-export function handlerValidateChirp(req: Request, res: Response) {
-    type reqBody = {
-        body: string
-    }
+export async function handlerGetChirpList(req: Request, res: Response) {
+    res.header("Content-Type", "application/json");
+
+    const chirps = await getChirpList();
+    res.status(200).send(JSON.stringify(chirps))
+}
+
+export async function handlerCreateChirp(req: Request, res: Response) {
+    res.header("Content-Type", "application/json");
+
+    const newChirp = validateChirp(req.body as NewChirp)
+    const chirp = await createChirp(newChirp);
     
-    type resData = {
-        cleanedBody: string
-    };
+    res.status(201).send(JSON.stringify(
+        {
+            id: chirp.id,
+            createdAt: chirp.createdAt,
+            updatedAt: chirp.updatedAt,
+            body: chirp.body,
+            userId: chirp.userId,
+        }
+    ));
+}
 
-    type resError = {
-        error: string
-    };
-
+function validateChirp(chirp: NewChirp): NewChirp {
     const badWords = [
         "kerfuffle",
         "sharbert",
         "fornax"
     ];
 
-    res.header("Content-Type", "application/json");
-    const body: reqBody = req.body
-
-    if (body.body.length > 140) {
-        throw new BadRequestError("Chirp is too long. Max length is 140")
+    if (chirp.body.length > 140) {
+        throw new BadRequestError("Chirp is too long. Max length is 140");
     }
 
     const pattern = new RegExp(`\\s(${badWords.join('|')})\\s`, "gi");
-    const cleanedBody = body.body.replace(pattern, " **** ")
+    chirp.body = chirp.body.replace(pattern, " **** ");
 
-    const resBody: resData = {
-        cleanedBody
-    }
-    res.status(200).send(JSON.stringify(resBody));
+    return chirp;
 }
