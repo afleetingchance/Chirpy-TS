@@ -1,7 +1,7 @@
-import { config } from "../config.js";
+import { config } from "../../config.js";
 import { Request, Response, NextFunction } from "express";
 
 export default function middlewareMetricsInc(req: Request, res: Response, next: NextFunction) {
-    config.fileserverHits++;
+    config.api.fileserverHits++;
     next();
 }
