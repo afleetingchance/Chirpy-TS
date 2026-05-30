@@ -1,13 +1,31 @@
 import { Request, Response } from "express";
-import { BadRequestError } from "../errorClasses.js";
+import { BadRequestError, NotFoundError } from "../errorClasses.js";
 import { NewChirp } from "../../db/schema.js";
-import { createChirp, getChirpList } from "../../db/queries/chirps.js";
+import { createChirp, getChirp, getChirpList } from "../../db/queries/chirps.js";
 
 export async function handlerGetChirpList(req: Request, res: Response) {
     res.header("Content-Type", "application/json");
 
     const chirps = await getChirpList();
     res.status(200).send(JSON.stringify(chirps))
+}
+
+export async function handlerGetChirp(req: Request, res: Response) {
+    res.header("Content-Type", "application/json");
+
+    const id = req.params.id
+
+    if (Array.isArray(id)) {
+        throw new BadRequestError("can only fetch one chirp")
+    }
+
+    const chirp = await getChirp(id);
+
+    if (chirp === undefined) {
+        throw new NotFoundError(`${id} chirp not found`);
+    }
+
+    res.status(200).send(JSON.stringify(chirp))
 }
 
 export async function handlerCreateChirp(req: Request, res: Response) {
