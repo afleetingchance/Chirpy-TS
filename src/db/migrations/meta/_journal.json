@@ -15,6 +15,13 @@
       "when": 1780086139287,
       "tag": "0001_tough_warhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781649692257,
+      "tag": "0002_talented_mauler",
+      "breakpoints": true
     }
   ]
 }

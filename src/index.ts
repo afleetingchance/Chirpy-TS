@@ -10,6 +10,7 @@ import handlerReadiness from "./app/handlers/readiness.js";
 import { handlerGetMetrics, handlerResetMetrics } from "./app/handlers/metrics.js";
 import { handlerCreateUser } from "./app/handlers/users.js";
 import { handlerCreateChirp, handlerGetChirp, handlerGetChirpList } from "./app/handlers/chirps.js";
+import { handlerLogin } from "./app/handlers/login.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 app.use(middlewareLogResponses);
 
 app.get("/api/healthz", handlerReadiness);
+app.post("/api/login", express.json(), handlerLogin)
 app.post("/api/users", express.json(), handlerCreateUser);
 app.get("/api/chirps", express.json(), handlerGetChirpList);
 app.get('/api/chirps/:id', express.json(), handlerGetChirp);
